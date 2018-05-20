@@ -7,4 +7,9 @@ export const TARGET_FETCH_SUCCEEDED = 'target_fetch_succeeded';
 export const TARGET_FETCH_FAILED = 'target_fetch_failed';
 
 export const TARGET_STATUS_UPDATE_COMPLETE = 'target_status_update_complete';
-export const TARGET_STATUS_UPDATE_START = 'target_status_update_start';
+export const TARGET_DATA_UPDATE_COMPLETE = 'target_data_update_complete';
+export const TARGET_UPDATE_START = 'target_update_start';
+
+export const TARGET_REMOVE = 'target_remove';
+export const TARGET_RESET = 'target_reset';
+export const TARGET_RUN = 'target_run';

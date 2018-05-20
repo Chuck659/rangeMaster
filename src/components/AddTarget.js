@@ -13,10 +13,9 @@ class AddTarget extends Component {
   }
   onButtonPress() {
     const { name, address } = this.props;
-    this.props.targetCreate({ name, address });
+    this.props.targetCreate({ name, address, status: 'unknown' });
   }
-  onEnter() {
-    console.log('onEnter');
+  onClear() {
     this.props.targetFormReset();
   }
   render() {
@@ -42,6 +41,10 @@ class AddTarget extends Component {
 
         <CardSection>
           <Button onPress={() => this.onButtonPress()}>Create</Button>
+        </CardSection>
+
+        <CardSection>
+          <Button onPress={() => this.onClear()}>Clear</Button>
         </CardSection>
       </Card>
     );

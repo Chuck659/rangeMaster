@@ -39,9 +39,9 @@ sagaMiddleware.run(rootSaga);
 //   .then(value => console.log(`Value: ${value}`))
 //   .catch(e => console.log(`Error: ${e}`));
 
-AsyncStorage.getItem('targets')
-  .then(value => console.log(`Value: ${value}`))
-  .catch(e => console.log(`Error: ${e}`));
+// AsyncStorage.getItem('targets')
+//   .then(value => console.log(`Value: ${value}`))
+//   .catch(e => console.log(`Error: ${e}`));
 
 import { YellowBox } from 'react-native';
 YellowBox.ignoreWarnings([
