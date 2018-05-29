@@ -4,7 +4,8 @@ import {
   TARGET_UPDATE_START,
   TARGET_REMOVE,
   TARGET_RESET,
-  TARGET_RUN
+  TARGET_RUN,
+  TARGET_EXEC_FUNCTION
 } from './types';
 
 export const fetchTargets = () => ({
@@ -28,4 +29,9 @@ export const runTarget = name => ({
 
 export const updateTargets = () => ({
   type: TARGET_UPDATE_START
+});
+
+export const executeFunction = (name, func) => ({
+  type: TARGET_EXEC_FUNCTION,
+  payload: { name, func }
 });

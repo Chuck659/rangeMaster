@@ -19,7 +19,7 @@ class TargetList extends Component {
   }
   componentDidMount() {
     this.props.fetchTargets();
-    this.timer = setInterval(() => this.props.updateTargets(), 1000);
+    this.timer = setInterval(() => this.props.updateTargets(), 300);
   }
 
   componentWillUnmount() {
@@ -46,6 +46,19 @@ class TargetList extends Component {
     }
   }
 
+  showData(data) {
+    if (!data) return null;
+    return (
+      <View>
+        {data.map((item, ndx) => (
+          <CardSection key={ndx}>
+            <Text>{item}</Text>
+          </CardSection>
+        ))}
+      </View>
+    );
+  }
+
   render() {
     // console.log(`targets: ${this.props.targets}`);
     const { targets } = this.props;
@@ -55,18 +68,13 @@ class TargetList extends Component {
           <View key={t.name}>
             <CardSection>
               <Button
-                delayLongPress={2500}
+                onPress={() => Actions.showTarget({ target: t })}
                 onLongPress={() => Actions.showTarget({ target: t })}
-                onPress={() => this.onPress(t)}
               >
                 {t.name} - {t.status}
               </Button>
             </CardSection>
-            {this.showTargetText !== t.name ? null : (
-              <CardSection>
-                <Text>{t.text}</Text>
-              </CardSection>
-            )}
+            {this.showData(t.text)}
           </View>
         ))}
         {targets.length === 0 ? null : (

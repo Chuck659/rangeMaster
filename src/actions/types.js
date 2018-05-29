@@ -13,3 +13,4 @@ export const TARGET_UPDATE_START = 'target_update_start';
 export const TARGET_REMOVE = 'target_remove';
 export const TARGET_RESET = 'target_reset';
 export const TARGET_RUN = 'target_run';
+export const TARGET_EXEC_FUNCTION = 'target_exec_function';

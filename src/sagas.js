@@ -17,7 +17,8 @@ import {
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_REMOVE,
   TARGET_RESET,
-  TARGET_RUN
+  TARGET_RUN,
+  TARGET_EXEC_FUNCTION
 } from './actions/types';
 
 function* fetchTargets(action) {
@@ -91,17 +92,20 @@ function* updateData() {
   // Cannot use forEach because yield
   for (let i = 0; i < targets.length; i++) {
     let t = targets[i];
-    try {
-      // console.log(`fetch: http://${t.address}/hitData`);
-      const data = yield call(() =>
-        fetch(`http://${t.address}/hitData`).then(res => res.json())
-      );
-      yield put({
-        type: TARGET_DATA_UPDATE_COMPLETE,
-        payload: { ...t, text: data.data }
-      });
-    } catch (e) {
-      // console.log(e.message);
+    if (t.status === 'complete') {
+      try {
+        // console.log(`fetch: http://${t.address}/hitData`);
+        const data = yield call(() =>
+          fetch(`http://${t.address}/hitData`).then(res => res.json())
+        );
+        console.log('here: ' + JSON.stringify(data));
+        yield put({
+          type: TARGET_DATA_UPDATE_COMPLETE,
+          payload: { ...t, text: data.data }
+        });
+      } catch (e) {
+        // console.log(e.message);
+      }
     }
   }
 }
@@ -143,6 +147,29 @@ function* runSaga() {
   yield takeEvery(TARGET_RUN, runTarget);
 }
 
+function* execTarget(action) {
+  const targets = yield select(getTargets);
+  console.log(action);
+  console.log(targets);
+  const target = targets.filter(t => t.name == action.payload.name)[0];
+  if (target) {
+    console.log(`http://${target.address}/${action.payload.func}`);
+    try {
+      yield call(() => {
+        fetch(`http://${target.address}/${action.payload.func}`).then(res =>
+          res.json()
+        );
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
+  }
+}
+
+function* execSaga() {
+  yield takeEvery(TARGET_EXEC_FUNCTION, execTarget);
+}
+
 export default function* rootSaga() {
   console.log(`rootSaga`);
   yield all([
@@ -152,6 +179,7 @@ export default function* rootSaga() {
     updateStatusSaga(),
     updateDataSaga(),
     resetSaga(),
-    runSaga()
+    runSaga(),
+    execSaga()
   ]);
 }
