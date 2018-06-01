@@ -1,11 +1,13 @@
 import { AsyncStorage } from 'react-native';
 import {
   TARGET_FETCH_REQUESTED,
-  TARGET_UPDATE_START,
+  TARGET_STATUS_UPDATE_START,
+  TARGET_DATA_UPDATE_START,
   TARGET_REMOVE,
   TARGET_RESET,
   TARGET_RUN,
-  TARGET_EXEC_FUNCTION
+  TARGET_EXEC_FUNCTION,
+  TARGET_NETWORK_ERROR
 } from './types';
 
 export const fetchTargets = () => ({
@@ -27,11 +29,20 @@ export const runTarget = name => ({
   payload: name
 });
 
-export const updateTargets = () => ({
-  type: TARGET_UPDATE_START
+export const updateStatus = () => ({
+  type: TARGET_STATUS_UPDATE_START
+});
+
+export const updateData = () => ({
+  type: TARGET_DATA_UPDATE_START
 });
 
 export const executeFunction = (name, func) => ({
   type: TARGET_EXEC_FUNCTION,
   payload: { name, func }
+});
+
+export const networkError = target => ({
+  type: TARGET_NETWORK_ERROR,
+  payload: target.name
 });

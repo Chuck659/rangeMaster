@@ -12,14 +12,17 @@ import {
   TARGET_FETCH_SUCCEEDED,
   TARGET_FETCH_FAILED,
   TARGET_CREATE,
-  TARGET_UPDATE_START,
+  TARGET_STATUS_UPDATE_START,
+  TARGET_DATA_UPDATE_START,
   TARGET_STATUS_UPDATE_COMPLETE,
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_REMOVE,
   TARGET_RESET,
   TARGET_RUN,
-  TARGET_EXEC_FUNCTION
+  TARGET_EXEC_FUNCTION,
+  TARGET_NETWORK_ERROR
 } from './actions/types';
+import { networkError } from './actions';
 
 function* fetchTargets(action) {
   try {
@@ -68,21 +71,24 @@ function* updateStatus() {
     try {
       // console.log(`fetch: http://${t.address}/status`);
       const data = yield call(() =>
-        fetch(`http://${t.address}/status`).then(res => res.json())
+        fetch(`http://${t.address}/status`)
+          .then(res => res.json())
+          .catch(() => networkError(t))
       );
       yield put({
         type: TARGET_STATUS_UPDATE_COMPLETE,
         payload: { ...t, status: data.status }
       });
     } catch (e) {
-      // console.log(e.message);
+      console.log(e.message);
+      yield put(networkError(t));
     }
   }
 }
 
 function* updateStatusSaga() {
   // console.log(`updateStatusSaga : ${TARGET_STATUS_UPDATE_START}`);
-  yield takeLatest(TARGET_UPDATE_START, updateStatus);
+  yield takeLatest(TARGET_STATUS_UPDATE_START, updateStatus);
 }
 
 function* updateData() {
@@ -92,27 +98,26 @@ function* updateData() {
   // Cannot use forEach because yield
   for (let i = 0; i < targets.length; i++) {
     let t = targets[i];
-    if (t.status === 'complete') {
-      try {
-        // console.log(`fetch: http://${t.address}/hitData`);
-        const data = yield call(() =>
-          fetch(`http://${t.address}/hitData`).then(res => res.json())
-        );
+    try {
+      const data = yield call(() =>
+        fetch(`http://${t.address}/hitData`).then(res => res.json())
+      );
+      if (data.data.length > 0) {
         console.log('here: ' + JSON.stringify(data));
-        yield put({
-          type: TARGET_DATA_UPDATE_COMPLETE,
-          payload: { ...t, text: data.data }
-        });
-      } catch (e) {
-        // console.log(e.message);
       }
+      yield put({
+        type: TARGET_DATA_UPDATE_COMPLETE,
+        payload: { ...t, text: data.data }
+      });
+    } catch (e) {
+      // console.log(e.message);
     }
   }
 }
 
 function* updateDataSaga() {
   // console.log(`updateDataSaga : ${TARGET_STATUS_UPDATE_START}`);
-  yield takeLatest(TARGET_UPDATE_START, updateData);
+  yield takeLatest(TARGET_DATA_UPDATE_START, updateData);
 }
 
 function* resetTarget(action) {
@@ -121,9 +126,13 @@ function* resetTarget(action) {
   console.log(targets);
   const target = targets.filter(t => t.name == action.payload)[0];
   if (target) {
-    yield call(() => {
-      fetch(`http://${target.address}/reset`).then(res => res.json());
-    });
+    try {
+      yield call(() => {
+        fetch(`http://${target.address}/reset`).then(res => res.json());
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
   }
 }
 
@@ -137,9 +146,17 @@ function* runTarget(action) {
   console.log(targets);
   const target = targets.filter(t => t.name == action.payload)[0];
   if (target) {
-    yield call(() => {
-      fetch(`http://${target.address}/start`).then(res => res.json());
-    });
+    const URL = `http://${target.address}/start`;
+    console.log(URL);
+    try {
+      yield call(() => {
+        fetch(URL)
+          .then(res => res.json())
+          .catch(e => console.log(e));
+      });
+    } catch (e) {
+      console.log(e.message);
+    }
   }
 }
 

@@ -6,7 +6,8 @@ import { Actions } from 'react-native-router-flux';
 
 import {
   fetchTargets,
-  updateTargets,
+  updateStatus,
+  updateData,
   runTarget,
   resetTarget
 } from '../actions';
@@ -19,7 +20,8 @@ class TargetList extends Component {
   }
   componentDidMount() {
     this.props.fetchTargets();
-    this.timer = setInterval(() => this.props.updateTargets(), 300);
+    this.timer = setInterval(() => this.props.updateStatus(), 300);
+    this.timer = setInterval(() => this.props.updateData(), 1000);
   }
 
   componentWillUnmount() {
@@ -68,8 +70,8 @@ class TargetList extends Component {
           <View key={t.name}>
             <CardSection>
               <Button
-                onPress={() => Actions.showTarget({ target: t })}
-                onLongPress={() => Actions.showTarget({ target: t })}
+                style={t.networkError ? styles.btnStyleNetworkError : null}
+                onPress={() => Actions.showTarget({ targetname: t.name })}
               >
                 {t.name} - {t.status}
               </Button>
@@ -87,12 +89,21 @@ class TargetList extends Component {
             <Button onPress={() => this.onReset()}>Reset All</Button>
           </CardSection>
         )}
+        {targets.length !== 0 ? null : (
+          <CardSection>
+            <Text>No Targets Defined - Press Add to add target</Text>
+          </CardSection>
+        )}
       </Card>
     );
   }
 }
 
-const styles = {};
+const styles = {
+  btnStyleNetworkError: {
+    backgroundColor: 'red'
+  }
+};
 
 const mapStateToProps = state => {
   return {
@@ -102,7 +113,8 @@ const mapStateToProps = state => {
 
 const actionsToMap = {
   fetchTargets,
-  updateTargets,
+  updateStatus,
+  updateData,
   runTarget,
   resetTarget
 };

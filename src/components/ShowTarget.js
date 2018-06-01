@@ -3,12 +3,21 @@ import { connect } from 'react-redux';
 import { Text, View, ScrollView } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { Card, CardSection, LabelledText, Button } from './common';
-import { deleteTarget, resetTarget, executeFunction } from '../actions';
+import {
+  deleteTarget,
+  runTarget,
+  resetTarget,
+  executeFunction
+} from '../actions';
 
 class ShowTarget extends Component {
   onDelete() {
     this.props.deleteTarget(this.props.target.name);
-    Actions.targetList();
+    Actions.pop();
+  }
+
+  onRun() {
+    this.props.runTarget(this.props.target.name);
   }
 
   onReset() {
@@ -53,9 +62,6 @@ class ShowTarget extends Component {
             <Button onPress={() => this.onFunction('function1')}>
               Function 1
             </Button>
-          </CardSection>
-
-          <CardSection>
             <Button onPress={() => this.onFunction('function2')}>
               Function 2
             </Button>
@@ -65,9 +71,6 @@ class ShowTarget extends Component {
             <Button onPress={() => this.onFunction('function3')}>
               Function 3
             </Button>
-          </CardSection>
-
-          <CardSection>
             <Button onPress={() => this.onFunction('function4')}>
               Function 4
             </Button>
@@ -77,9 +80,6 @@ class ShowTarget extends Component {
             <Button onPress={() => this.onFunction('function5')}>
               Function 5
             </Button>
-          </CardSection>
-
-          <CardSection>
             <Button onPress={() => this.onFunction('function6')}>
               Function 6
             </Button>
@@ -89,7 +89,15 @@ class ShowTarget extends Component {
             <Button onPress={() => this.onFunction('function7')}>
               Function 7
             </Button>
+            <Button onPress={() => this.onRun()}>Run</Button>
           </CardSection>
+
+          <View>
+            <CardSection>
+              <LabelledText label="Hit Data" text="" />
+            </CardSection>
+            {this.showData(target.text)}
+          </View>
 
           <CardSection>
             <Button onPress={() => this.onReset()}>Reset Target</Button>
@@ -98,22 +106,19 @@ class ShowTarget extends Component {
           <CardSection>
             <Button onPress={() => this.onDelete()}>Delete</Button>
           </CardSection>
-
-          {target.text.length == 0 ? null : (
-            <View>
-              <CardSection>
-                <LabelledText label="Hit Data" text="" />
-              </CardSection>
-              {this.showData(target.text)}
-            </View>
-          )}
         </Card>
       </ScrollView>
     );
   }
 }
 
+const mapStateToProps = (state, ownprops) => {
+  return {
+    target: state.targets.filter(t => t.name == ownprops.targetname)[0]
+  };
+};
+
 const styles = {};
 
-const actionsToMap = { deleteTarget, resetTarget, executeFunction };
-export default connect(null, actionsToMap)(ShowTarget);
+const actionsToMap = { deleteTarget, runTarget, resetTarget, executeFunction };
+export default connect(mapStateToProps, actionsToMap)(ShowTarget);
