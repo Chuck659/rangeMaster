@@ -43,6 +43,7 @@ class ShowTarget extends Component {
 
   render() {
     const { target } = this.props;
+    if (!target) return <View />;
     return (
       <ScrollView>
         <Card>
