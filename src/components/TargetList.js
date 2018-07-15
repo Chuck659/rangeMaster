@@ -20,7 +20,7 @@ class TargetList extends Component {
   }
   componentDidMount() {
     this.props.fetchTargets();
-    this.timer = setInterval(() => this.props.updateStatus(), 300);
+    this.timer = setInterval(() => this.props.updateStatus(), 2000);
     this.timer = setInterval(() => this.props.updateData(), 1000);
   }
 
@@ -118,4 +118,7 @@ const actionsToMap = {
   runTarget,
   resetTarget
 };
-export default connect(mapStateToProps, actionsToMap)(TargetList);
+export default connect(
+  mapStateToProps,
+  actionsToMap
+)(TargetList);
