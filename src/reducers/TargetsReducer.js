@@ -11,6 +11,7 @@ import {
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_NETWORK_ERROR
 } from '../actions/types';
+import Debug from '../Debug';
 
 const INITIAL_STATE = [];
 
@@ -71,8 +72,9 @@ export default (state = INITIAL_STATE, action) => {
       return state.filter(t => t.name != action.payload);
 
     case TARGET_NETWORK_ERROR:
+      // Debug.log(`TARGET_NETWORK_ERROR : ${action.payload}`);
       return state.map(t => {
-        if (t.name === action.payload.name) {
+        if (t.name === action.payload) {
           return { ...t, networkError: true };
         } else {
           return t;

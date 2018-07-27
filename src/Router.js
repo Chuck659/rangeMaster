@@ -3,6 +3,7 @@ import { Scene, Router, Actions } from 'react-native-router-flux';
 import TargetList from './components/TargetList';
 import AddTarget from './components/AddTarget';
 import ShowTarget from './components/ShowTarget';
+import ShowDebug from './components/ShowDebug';
 
 const RouterComponent = props => {
   return (
@@ -23,6 +24,10 @@ const RouterComponent = props => {
           <Scene
             key="addTarget"
             component={AddTarget}
+            rightTitle="x"
+            onRight={() => {
+              Actions.showDebug();
+            }}
             title="Add Target"
             titleStyle={{ alignSelf: 'center' }}
           />
@@ -30,6 +35,12 @@ const RouterComponent = props => {
             key="showTarget"
             component={ShowTarget}
             title="Target Details"
+            titleStyle={{ alignSelf: 'center' }}
+          />
+          <Scene
+            key="showDebug"
+            component={ShowDebug}
+            title="Debug"
             titleStyle={{ alignSelf: 'center' }}
           />
         </Scene>

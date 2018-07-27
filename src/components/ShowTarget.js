@@ -122,4 +122,7 @@ const mapStateToProps = (state, ownprops) => {
 const styles = {};
 
 const actionsToMap = { deleteTarget, runTarget, resetTarget, executeFunction };
-export default connect(mapStateToProps, actionsToMap)(ShowTarget);
+export default connect(
+  mapStateToProps,
+  actionsToMap
+)(ShowTarget);

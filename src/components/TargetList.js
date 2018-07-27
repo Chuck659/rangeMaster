@@ -3,6 +3,7 @@ import { View, Text, AccessibilityInfo } from 'react-native';
 import { connect } from 'react-redux';
 import { Card, CardSection, Button, Input } from './common';
 import { Actions } from 'react-native-router-flux';
+import Debug from '../Debug';
 
 import {
   fetchTargets,
@@ -15,17 +16,21 @@ import {
 class TargetList extends Component {
   constructor(props) {
     super(props);
-    this.timer;
+    this.timer1;
+    this.timer2;
     this.showTargetText = '';
   }
   componentDidMount() {
+    Debug.log('TargetList::componentDidMount');
     this.props.fetchTargets();
-    this.timer = setInterval(() => this.props.updateStatus(), 2000);
-    this.timer = setInterval(() => this.props.updateData(), 1000);
+    this.timer1 = setInterval(() => this.props.updateStatus(), 2000);
+    this.timer2 = setInterval(() => this.props.updateData(), 1000);
   }
 
   componentWillUnmount() {
-    clearInterval(this.timer);
+    Debug.log('TargetList::componentWillUnmount');
+    clearInterval(this.timer1);
+    clearInterval(this.timer2);
   }
 
   onRun() {

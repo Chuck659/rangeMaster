@@ -23,6 +23,7 @@ import {
   TARGET_NETWORK_ERROR
 } from './actions/types';
 import { networkError } from './actions';
+import Debug from './Debug';
 
 function* fetchTargets(action) {
   try {
@@ -38,6 +39,7 @@ function* fetchTargets(action) {
 
 function* fetchSaga() {
   console.log(`fetchSaga: ${TARGET_FETCH_REQUESTED}`);
+  Debug.log(`fetchSaga: ${TARGET_FETCH_REQUESTED}`);
   yield takeEvery(TARGET_FETCH_REQUESTED, fetchTargets);
 }
 
@@ -73,14 +75,15 @@ function* updateStatus() {
       const data = yield call(() =>
         fetch(`http://${t.address}/status`)
           .then(res => res.json())
+          .then(json => ({
+            type: TARGET_STATUS_UPDATE_COMPLETE,
+            payload: { ...t, status: json.status }
+          }))
           .catch(() => networkError(t))
       );
-      yield put({
-        type: TARGET_STATUS_UPDATE_COMPLETE,
-        payload: { ...t, status: data.status }
-      });
+      yield put(data);
     } catch (e) {
-      console.log(e.message);
+      Debug.log(e.message);
       yield put(networkError(t));
     }
   }
