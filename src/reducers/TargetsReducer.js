@@ -22,7 +22,7 @@ export default (state = INITIAL_STATE, action) => {
     action.type != TARGET_STATUS_UPDATE_START &&
     action.type != TARGET_DATA_UPDATE_START
   ) {
-    console.log(
+    Debug.log(
       `Targets Reducer: ${JSON.stringify(action)}, ${JSON.stringify(state)}`
     );
   }
@@ -72,7 +72,7 @@ export default (state = INITIAL_STATE, action) => {
       return state.filter(t => t.name != action.payload);
 
     case TARGET_NETWORK_ERROR:
-      // Debug.log(`TARGET_NETWORK_ERROR : ${action.payload}`);
+      Debug.log(`TARGET_NETWORK_ERROR : ${action.payload}`);
       return state.map(t => {
         if (t.name === action.payload) {
           return { ...t, networkError: true };

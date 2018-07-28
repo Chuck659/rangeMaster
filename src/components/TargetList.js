@@ -16,15 +16,17 @@ import {
 class TargetList extends Component {
   constructor(props) {
     super(props);
-    this.timer1;
-    this.timer2;
     this.showTargetText = '';
   }
   componentDidMount() {
     Debug.log('TargetList::componentDidMount');
     this.props.fetchTargets();
-    this.timer1 = setInterval(() => this.props.updateStatus(), 2000);
-    this.timer2 = setInterval(() => this.props.updateData(), 1000);
+    this.timer1 = setInterval(() => {
+      this.props.updateStatus();
+    }, 2000);
+    this.timer2 = setInterval(() => {
+      this.props.updateData();
+    }, 1000);
   }
 
   componentWillUnmount() {
@@ -67,7 +69,7 @@ class TargetList extends Component {
   }
 
   render() {
-    // console.log(`targets: ${this.props.targets}`);
+    Debug.log(`targets: ${JSON.stringify(this.props.targets)}`);
     const { targets } = this.props;
     return (
       <Card>
@@ -75,10 +77,9 @@ class TargetList extends Component {
           <View key={t.name}>
             <CardSection>
               <Button
-                style={t.networkError ? styles.btnStyleNetworkError : null}
                 onPress={() => Actions.showTarget({ targetname: t.name })}
               >
-                {t.name} - {t.status}
+                {t.name} - {t.networkError ? 'network error' : t.status}
               </Button>
             </CardSection>
             {this.showData(t.text)}
@@ -106,7 +107,7 @@ class TargetList extends Component {
 
 const styles = {
   btnStyleNetworkError: {
-    backgroundColor: 'red'
+    color: 'red'
   }
 };
 

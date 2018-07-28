@@ -27,18 +27,16 @@ import Debug from './Debug';
 
 function* fetchTargets(action) {
   try {
-    console.log(`fetchTargets saga: ${action.type}`);
     const targets = yield call(() => AsyncStorage.getItem('targets'));
-    console.log(`fetchTargets: ${targets}`);
+    Debug.log(`fetchTargets: ${targets}`);
     yield put({ type: TARGET_FETCH_SUCCEEDED, payload: JSON.parse(targets) });
   } catch (e) {
-    console.log(`catch ${e.message}`);
+    Debug.log(`catch ${e.message}`);
     yield put({ type: TARGET_FETCH_FAILED, payload: e.message });
   }
 }
 
 function* fetchSaga() {
-  console.log(`fetchSaga: ${TARGET_FETCH_REQUESTED}`);
   Debug.log(`fetchSaga: ${TARGET_FETCH_REQUESTED}`);
   yield takeEvery(TARGET_FETCH_REQUESTED, fetchTargets);
 }
@@ -65,13 +63,13 @@ function* removeSaga() {
 
 function* updateStatus() {
   const targets = yield select(getTargets);
-  // console.log(`updateStatus: ${JSON.stringify(targets)}`);
 
   // Cannot use forEach because yield
   for (let i = 0; i < targets.length; i++) {
     let t = targets[i];
     try {
-      // console.log(`fetch: http://${t.address}/status`);
+      // Debug.log(`fetch: http://${t.address}/status`);
+      let stime = new Date().getTime();
       const data = yield call(() =>
         fetch(`http://${t.address}/status`)
           .then(res => res.json())
@@ -79,18 +77,19 @@ function* updateStatus() {
             type: TARGET_STATUS_UPDATE_COMPLETE,
             payload: { ...t, status: json.status }
           }))
-          .catch(() => networkError(t))
+          .catch(e => networkError(t))
       );
+
+      // Debug.log(`updateStatus: ${new Date().getTime() - stime}`);
       yield put(data);
     } catch (e) {
-      Debug.log(e.message);
+      Debug.log('catch: ' + e.message);
       yield put(networkError(t));
     }
   }
 }
 
 function* updateStatusSaga() {
-  // console.log(`updateStatusSaga : ${TARGET_STATUS_UPDATE_START}`);
   yield takeLatest(TARGET_STATUS_UPDATE_START, updateStatus);
 }
 
@@ -191,7 +190,7 @@ function* execSaga() {
 }
 
 export default function* rootSaga() {
-  console.log(`rootSaga`);
+  Debug.log(`rootSaga`);
   yield all([
     fetchSaga(),
     saveSaga(),
