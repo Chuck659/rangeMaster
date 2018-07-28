@@ -10,7 +10,8 @@ import {
   updateStatus,
   updateData,
   runTarget,
-  resetTarget
+  resetTarget,
+  clearTargetData
 } from '../actions';
 
 class TargetList extends Component {
@@ -47,6 +48,12 @@ class TargetList extends Component {
     });
   }
 
+  onClearData() {
+    this.props.targets.forEach(t => {
+      this.props.clearTargetData(t.name);
+    });
+  }
+
   onPress(target) {
     if (this.showTargetText == target.name) {
       this.showTargetText = '';
@@ -69,7 +76,7 @@ class TargetList extends Component {
   }
 
   render() {
-    Debug.log(`targets: ${JSON.stringify(this.props.targets)}`);
+    // Debug.log(`targets: ${JSON.stringify(this.props.targets)}`);
     const { targets } = this.props;
     return (
       <Card>
@@ -92,7 +99,7 @@ class TargetList extends Component {
         )}
         {targets.length === 0 ? null : (
           <CardSection>
-            <Button onPress={() => this.onReset()}>Reset All</Button>
+            <Button onPress={() => this.onClearData()}>Clear All Data</Button>
           </CardSection>
         )}
         {targets.length !== 0 ? null : (
@@ -122,7 +129,8 @@ const actionsToMap = {
   updateStatus,
   updateData,
   runTarget,
-  resetTarget
+  resetTarget,
+  clearTargetData
 };
 export default connect(
   mapStateToProps,

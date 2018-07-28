@@ -7,6 +7,7 @@ import {
   deleteTarget,
   runTarget,
   resetTarget,
+  clearTargetData,
   executeFunction
 } from '../actions';
 
@@ -22,6 +23,10 @@ class ShowTarget extends Component {
 
   onReset() {
     this.props.resetTarget(this.props.target.name);
+  }
+
+  onClearData() {
+    this.props.clearTargetData(this.props.target.name);
   }
 
   onFunction(func) {
@@ -101,7 +106,7 @@ class ShowTarget extends Component {
           </View>
 
           <CardSection>
-            <Button onPress={() => this.onReset()}>Reset Target</Button>
+            <Button onPress={() => this.onClearData()}>Clear Data</Button>
           </CardSection>
 
           <CardSection>
@@ -121,7 +126,13 @@ const mapStateToProps = (state, ownprops) => {
 
 const styles = {};
 
-const actionsToMap = { deleteTarget, runTarget, resetTarget, executeFunction };
+const actionsToMap = {
+  deleteTarget,
+  runTarget,
+  resetTarget,
+  clearTargetData,
+  executeFunction
+};
 export default connect(
   mapStateToProps,
   actionsToMap

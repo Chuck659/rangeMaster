@@ -3,6 +3,7 @@ import {
   TARGET_FETCH_REQUESTED,
   TARGET_STATUS_UPDATE_START,
   TARGET_DATA_UPDATE_START,
+  TARGET_DATA_CLEAR,
   TARGET_REMOVE,
   TARGET_RESET,
   TARGET_RUN,
@@ -21,6 +22,11 @@ export const deleteTarget = name => ({
 
 export const resetTarget = name => ({
   type: TARGET_RESET,
+  payload: name
+});
+
+export const clearTargetData = name => ({
+  type: TARGET_DATA_CLEAR,
   payload: name
 });
 

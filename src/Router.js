@@ -19,15 +19,15 @@ const RouterComponent = props => {
             onRight={() => {
               Actions.addTarget();
             }}
+            leftTitle="x"
+            onLeft={() => {
+              Actions.showDebug();
+            }}
             titleStyle={{ alignSelf: 'center' }}
           />
           <Scene
             key="addTarget"
             component={AddTarget}
-            rightTitle="x"
-            onRight={() => {
-              Actions.showDebug();
-            }}
             title="Add Target"
             titleStyle={{ alignSelf: 'center' }}
           />

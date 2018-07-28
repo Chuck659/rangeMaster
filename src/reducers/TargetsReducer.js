@@ -9,6 +9,7 @@ import {
   TARGET_DATA_UPDATE_START,
   TARGET_STATUS_UPDATE_COMPLETE,
   TARGET_DATA_UPDATE_COMPLETE,
+  TARGET_DATA_CLEAR,
   TARGET_NETWORK_ERROR
 } from '../actions/types';
 import Debug from '../Debug';
@@ -51,7 +52,21 @@ export default (state = INITIAL_STATE, action) => {
     case TARGET_DATA_UPDATE_COMPLETE:
       return state.map(t => {
         if (t.name === action.payload.name) {
-          return { ...t, text: action.payload.text };
+          return {
+            ...t,
+            text: t.text
+              ? t.text.concat(action.payload.text)
+              : action.payload.text
+          };
+        } else {
+          return t;
+        }
+      });
+
+    case TARGET_DATA_CLEAR:
+      return state.map(t => {
+        if (t.name === action.payload) {
+          return { ...t, text: '' };
         } else {
           return t;
         }

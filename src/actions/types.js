@@ -10,6 +10,7 @@ export const TARGET_STATUS_UPDATE_COMPLETE = 'target_status_update_complete';
 export const TARGET_DATA_UPDATE_COMPLETE = 'target_data_update_complete';
 export const TARGET_STATUS_UPDATE_START = 'target_update_start';
 export const TARGET_DATA_UPDATE_START = 'target_data_update_start';
+export const TARGET_DATA_CLEAR = 'target_data_clear';
 
 export const TARGET_REMOVE = 'target_remove';
 export const TARGET_RESET = 'target_reset';

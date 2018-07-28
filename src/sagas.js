@@ -106,6 +106,7 @@ function* updateData() {
       );
       if (data.data.length > 0) {
         console.log('here: ' + JSON.stringify(data));
+        console.log('here: ' + JSON.stringify(t));
       }
       yield put({
         type: TARGET_DATA_UPDATE_COMPLETE,
