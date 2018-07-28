@@ -107,11 +107,12 @@ function* updateData() {
       if (data.data.length > 0) {
         console.log('here: ' + JSON.stringify(data));
         console.log('here: ' + JSON.stringify(t));
+
+        yield put({
+          type: TARGET_DATA_UPDATE_COMPLETE,
+          payload: { ...t, text: data.data }
+        });
       }
-      yield put({
-        type: TARGET_DATA_UPDATE_COMPLETE,
-        payload: { ...t, text: data.data }
-      });
     } catch (e) {
       // console.log(e.message);
     }
