@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, AccessibilityInfo } from 'react-native';
+import { ScrollView, View, Text, AccessibilityInfo } from 'react-native';
 import { connect } from 'react-redux';
 import { Card, CardSection, Button, Input } from './common';
 import { Actions } from 'react-native-router-flux';
@@ -8,6 +8,7 @@ import Debug from '../Debug';
 import {
   fetchTargets,
   updateStatus,
+  updateDataStart,
   updateData,
   runTarget,
   resetTarget,
@@ -18,22 +19,25 @@ class TargetList extends Component {
   constructor(props) {
     super(props);
     this.showTargetText = '';
+    this.timers = {};
+    this.timer = null;
   }
+
   componentDidMount() {
-    Debug.log('TargetList::componentDidMount');
+    Debug.log(
+      `TargetList::componentDidMount: ${JSON.stringify(this.props.targets)}`
+    );
     this.props.fetchTargets();
-    this.timer1 = setInterval(() => {
-      this.props.updateStatus();
-    }, 2000);
-    this.timer2 = setInterval(() => {
-      this.props.updateData();
-    }, 1000);
+    this.timer = setInterval(() => {
+      if (this.props.targets) {
+        this.props.targets.forEach(this.checkTimer.bind(this));
+      }
+    }, 250);
   }
 
   componentWillUnmount() {
     Debug.log('TargetList::componentWillUnmount');
-    clearInterval(this.timer1);
-    clearInterval(this.timer2);
+    clearInterval(this.timer);
   }
 
   onRun() {
@@ -75,11 +79,25 @@ class TargetList extends Component {
     );
   }
 
+  checkTimer(target) {
+    // Debug.log(`==> ${JSON.stringify(target)}`);
+    if (!target.polling && !this.timers[target.name]) {
+      // Debug.log(`start timer: ${target.name}`);
+      this.timers[target.name] = setTimeout(() => {
+        // Debug.log(`timer fired: ${target.name}`);
+        this.props.updateDataStart(target.name);
+        this.props.updateData(target.name);
+        this.timers[target.name] = null;
+      }, 500);
+    }
+  }
+
   render() {
     // Debug.log(`targets: ${JSON.stringify(this.props.targets)}`);
     const { targets } = this.props;
+    
     return (
-      <Card>
+      <ScrollView>
         {targets.map(t => (
           <View key={t.name}>
             <CardSection>
@@ -107,7 +125,7 @@ class TargetList extends Component {
             <Text>No Targets Defined - Press Add to add target</Text>
           </CardSection>
         )}
-      </Card>
+      </ScrollView>
     );
   }
 }
@@ -128,6 +146,7 @@ const actionsToMap = {
   fetchTargets,
   updateStatus,
   updateData,
+  updateDataStart,
   runTarget,
   resetTarget,
   clearTargetData

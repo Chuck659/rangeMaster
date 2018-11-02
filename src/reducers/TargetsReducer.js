@@ -7,6 +7,7 @@ import {
   TARGET_RESET,
   TARGET_STATUS_UPDATE_START,
   TARGET_DATA_UPDATE_START,
+  TARGET_DATA_UPDATE,
   TARGET_STATUS_UPDATE_COMPLETE,
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_DATA_CLEAR,
@@ -18,11 +19,8 @@ const INITIAL_STATE = [];
 
 export default (state = INITIAL_STATE, action) => {
   if (
-    action.type != TARGET_STATUS_UPDATE_COMPLETE &&
-    action.type != TARGET_DATA_UPDATE_COMPLETE &&
-    action.type != TARGET_STATUS_UPDATE_START &&
-    action.type != TARGET_DATA_UPDATE_START
-  ) {
+    false
+    ) {
     Debug.log(
       `Targets Reducer: ${JSON.stringify(action)}, ${JSON.stringify(state)}`
     );
@@ -34,9 +32,10 @@ export default (state = INITIAL_STATE, action) => {
       } else {
         return action.payload.map(target => ({
           ...target,
-          status: 'Unknown',
+          status: 'unknown',
           networkError: false,
-          text: ''
+          polling: false,
+          text: []
         }));
       }
 
@@ -49,14 +48,28 @@ export default (state = INITIAL_STATE, action) => {
         }
       });
 
+    case TARGET_DATA_UPDATE_START:
+      return state.map(t => {
+        if (t.name === action.payload) {
+          return { ...t, polling: true };
+        } else {
+          return t;
+        }
+      });
+
     case TARGET_DATA_UPDATE_COMPLETE:
       return state.map(t => {
         if (t.name === action.payload.name) {
+          let noBlankLines = action.payload.text.filter((t) => t.length > 0);
+          let networkError = action.payload.hasOwnProperty("networkError") ? action.payload.networkError : t.networkError;
           return {
-            ...t,
+            ...t, 
+            polling: false,
+            status: action.payload.status,
             text: t.text
-              ? t.text.concat(action.payload.text)
-              : action.payload.text
+              ? t.text.concat(noBlankLines)
+              : noBlankLines,
+            networkError
           };
         } else {
           return t;

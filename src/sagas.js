@@ -13,7 +13,7 @@ import {
   TARGET_FETCH_FAILED,
   TARGET_CREATE,
   TARGET_STATUS_UPDATE_START,
-  TARGET_DATA_UPDATE_START,
+  TARGET_DATA_UPDATE,
   TARGET_STATUS_UPDATE_COMPLETE,
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_REMOVE,
@@ -24,6 +24,9 @@ import {
 } from './actions/types';
 import { networkError } from './actions';
 import Debug from './Debug';
+
+// let testPort = ":8080";
+let testPort = "";
 
 function* fetchTargets(action) {
   try {
@@ -63,29 +66,40 @@ function* removeSaga() {
 
 function* updateStatus() {
   const targets = yield select(getTargets);
+  try {
+    // Cannot use forEach because yield
+    for (let i = 0; i < targets.length; i++) {
+      let t = targets[i];
+      if (true) {
+        try {
+          // Debug.log(`fetch: http://${t.address}${testPort}/status`);
+          let stime = new Date().getTime();
+          const data = yield call(() =>
+            fetch(`http://${t.address}${testPort}/status`)
+              .then(res => res.json())
+              .then(json => {
+                return {
+                  type: TARGET_STATUS_UPDATE_COMPLETE,
+                  payload: { ...t, status: json.status }
+                };
+              })
+              .catch(e => {
+                Debug.log('catch: ' + e.message);
+                networkError(t);
+                return { type: 'dummy', payload: '' };
+              })
+          );
 
-  // Cannot use forEach because yield
-  for (let i = 0; i < targets.length; i++) {
-    let t = targets[i];
-    try {
-      // Debug.log(`fetch: http://${t.address}/status`);
-      let stime = new Date().getTime();
-      const data = yield call(() =>
-        fetch(`http://${t.address}/status`)
-          .then(res => res.json())
-          .then(json => ({
-            type: TARGET_STATUS_UPDATE_COMPLETE,
-            payload: { ...t, status: json.status }
-          }))
-          .catch(e => networkError(t))
-      );
-
-      // Debug.log(`updateStatus: ${new Date().getTime() - stime}`);
-      yield put(data);
-    } catch (e) {
-      Debug.log('catch: ' + e.message);
-      yield put(networkError(t));
+          // Debug.log(`updateStatus: ${new Date().getTime() - stime}`);
+          yield put(data);
+        } catch (e) {
+          Debug.log('catch: ' + e.message);
+          yield put(networkError(t));
+        }
+      }
     }
+  } catch (e) {
+    Debug.log(e.message);
   }
 }
 
@@ -93,35 +107,47 @@ function* updateStatusSaga() {
   yield takeLatest(TARGET_STATUS_UPDATE_START, updateStatus);
 }
 
-function* updateData() {
+function* updateData(action) {
   const targets = yield select(getTargets);
-  // console.log(`updateStatus: ${JSON.stringify(targets)}`);
-
-  // Cannot use forEach because yield
-  for (let i = 0; i < targets.length; i++) {
-    let t = targets[i];
+  // Debug.log(`Action: ${JSON.stringify(action)}`);
+  // Debug.log(`Targets: ${JSON.stringify(targets)}`);
+  const target = targets.filter(t => t.name == action.payload)[0];
+  // Debug.log(`target: ${JSON.stringify(target)}`);
+  if (target) {
     try {
+      // Debug.log(`==> http://${target.address}${testPort}/hitData`);
       const data = yield call(() =>
-        fetch(`http://${t.address}/hitData`).then(res => res.json())
+        fetch(`http://${target.address}${testPort}/hitData`)
+          .then(res => {
+            return res.json();
+          })
+          .then(json => ({...json, networkError: false}))
+          .catch(e => {
+            Debug.log('error on fetch : ' + JSON.stringify(e));
+            return { data: [], networkError: true };
+          })
       );
+      // Debug.log(`here: ${target.name} ` + JSON.stringify(data));
       if (data.data.length > 0) {
-        console.log('here: ' + JSON.stringify(data));
-        console.log('here: ' + JSON.stringify(t));
-
-        yield put({
-          type: TARGET_DATA_UPDATE_COMPLETE,
-          payload: { ...t, text: data.data }
-        });
+        Debug.log('here: ' + JSON.stringify(data));
       }
+      yield put({
+        type: TARGET_DATA_UPDATE_COMPLETE,
+        payload: { ...target, status: data.status, text: data.data, networkError: data.networkError }
+      });
     } catch (e) {
-      // console.log(e.message);
+      Debug.log(`Catch: ${JSON.stringify(e)}`);
+      yield put({
+        type: TARGET_DATA_UPDATE_COMPLETE,
+        payload: { ...target, text: [] }
+      });
     }
   }
 }
 
 function* updateDataSaga() {
   // console.log(`updateDataSaga : ${TARGET_STATUS_UPDATE_START}`);
-  yield takeLatest(TARGET_DATA_UPDATE_START, updateData);
+  yield takeEvery(TARGET_DATA_UPDATE, updateData);
 }
 
 function* resetTarget(action) {
@@ -132,7 +158,9 @@ function* resetTarget(action) {
   if (target) {
     try {
       yield call(() => {
-        fetch(`http://${target.address}/reset`).then(res => res.json());
+        fetch(`http://${target.address}${testPort}/reset`).then(res =>
+          res.json()
+        );
       });
     } catch (e) {
       console.log(e.message);
@@ -150,7 +178,7 @@ function* runTarget(action) {
   console.log(targets);
   const target = targets.filter(t => t.name == action.payload)[0];
   if (target) {
-    const URL = `http://${target.address}/start`;
+    const URL = `http://${target.address}${testPort}/start`;
     console.log(URL);
     try {
       yield call(() => {
@@ -174,12 +202,12 @@ function* execTarget(action) {
   console.log(targets);
   const target = targets.filter(t => t.name == action.payload.name)[0];
   if (target) {
-    console.log(`http://${target.address}/${action.payload.func}`);
+    console.log(`http://${target.address}${testPort}/${action.payload.func}`);
     try {
       yield call(() => {
-        fetch(`http://${target.address}/${action.payload.func}`).then(res =>
-          res.json()
-        );
+        fetch(
+          `http://${target.address}${testPort}/${action.payload.func}`
+        ).then(res => res.json());
       });
     } catch (e) {
       console.log(e.message);
