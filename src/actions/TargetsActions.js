@@ -9,7 +9,8 @@ import {
   TARGET_RESET,
   TARGET_RUN,
   TARGET_EXEC_FUNCTION,
-  TARGET_NETWORK_ERROR
+  TARGET_NETWORK_ERROR,
+  TOGGLE_DISABLED
 } from './types';
 
 export const fetchTargets = () => ({
@@ -62,4 +63,9 @@ export const executeFunction = (name, func) => ({
 export const networkError = target => ({
   type: TARGET_NETWORK_ERROR,
   payload: target.name
+});
+
+export const toggleDisabled = name => ({
+  type: TOGGLE_DISABLED,
+  payload: name
 });

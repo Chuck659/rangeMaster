@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Text, View, ScrollView } from 'react-native';
+import { Text, View, ScrollView, CheckBox } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 import { Card, CardSection, LabelledText, Button } from './common';
+// import Debug from '../Debug';
 import {
   deleteTarget,
   runTarget,
   resetTarget,
   clearTargetData,
-  executeFunction
+  executeFunction,
+  toggleDisabled
 } from '../actions';
 
 class ShowTarget extends Component {
@@ -31,6 +33,10 @@ class ShowTarget extends Component {
 
   onFunction(func) {
     this.props.executeFunction(this.props.target.name, func);
+  }
+
+  onPress() {
+    this.props.toggleDisabled(this.props.target.name);
   }
 
   showData(data) {
@@ -110,8 +116,13 @@ class ShowTarget extends Component {
           </CardSection>
 
           <CardSection>
+            <Button onPress={() => this.onPress()}>{!target.disabled ? "Disable" : "Enable"}</Button>
+          </CardSection>
+
+          <CardSection>
             <Button onPress={() => this.onDelete()}>Delete</Button>
           </CardSection>
+          <CardSection></CardSection>
         </Card>
       </ScrollView>
     );
@@ -131,7 +142,8 @@ const actionsToMap = {
   runTarget,
   resetTarget,
   clearTargetData,
-  executeFunction
+  executeFunction,
+  toggleDisabled
 };
 export default connect(
   mapStateToProps,

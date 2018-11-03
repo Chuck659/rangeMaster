@@ -112,10 +112,10 @@ function* updateData(action) {
   // Debug.log(`Action: ${JSON.stringify(action)}`);
   // Debug.log(`Targets: ${JSON.stringify(targets)}`);
   const target = targets.filter(t => t.name == action.payload)[0];
-  // Debug.log(`target: ${JSON.stringify(target)}`);
   if (target) {
+    Debug.log(`target: ${JSON.stringify(target)}`);
     try {
-      // Debug.log(`==> http://${target.address}${testPort}/hitData`);
+      Debug.log(`==> http://${target.address}${testPort}/hitData`);
       const data = yield call(() =>
         fetch(`http://${target.address}${testPort}/hitData`)
           .then(res => {
@@ -123,11 +123,11 @@ function* updateData(action) {
           })
           .then(json => ({...json, networkError: false}))
           .catch(e => {
-            Debug.log('error on fetch : ' + JSON.stringify(e));
-            return { data: [], networkError: true };
+            Debug.log(`error on fetch :  ${JSON.stringify(e)} ${target.name}`);
+            return { data: [], status: target.status, networkError: true };
           })
       );
-      // Debug.log(`here: ${target.name} ` + JSON.stringify(data));
+      Debug.log(`here: ${target.name} ` + JSON.stringify(data));
       if (data.data.length > 0) {
         Debug.log('here: ' + JSON.stringify(data));
       }

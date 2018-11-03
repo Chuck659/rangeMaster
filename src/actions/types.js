@@ -12,6 +12,7 @@ export const TARGET_STATUS_UPDATE_START = 'target_update_start';
 export const TARGET_DATA_UPDATE = 'target_data_update';
 export const TARGET_DATA_UPDATE_START = 'target_data_update_start';
 export const TARGET_DATA_CLEAR = 'target_data_clear';
+export const TOGGLE_DISABLED = 'toggle_disabled';
 
 export const TARGET_REMOVE = 'target_remove';
 export const TARGET_RESET = 'target_reset';

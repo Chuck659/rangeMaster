@@ -11,7 +11,8 @@ import {
   TARGET_STATUS_UPDATE_COMPLETE,
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_DATA_CLEAR,
-  TARGET_NETWORK_ERROR
+  TARGET_NETWORK_ERROR,
+  TOGGLE_DISABLED
 } from '../actions/types';
 import Debug from '../Debug';
 
@@ -19,7 +20,7 @@ const INITIAL_STATE = [];
 
 export default (state = INITIAL_STATE, action) => {
   if (
-    false
+    action.type == TOGGLE_DISABLED
     ) {
     Debug.log(
       `Targets Reducer: ${JSON.stringify(action)}, ${JSON.stringify(state)}`
@@ -35,6 +36,7 @@ export default (state = INITIAL_STATE, action) => {
           status: 'unknown',
           networkError: false,
           polling: false,
+          disabled: false,
           text: []
         }));
       }
@@ -108,6 +110,17 @@ export default (state = INITIAL_STATE, action) => {
           return t;
         }
       });
+
+    case TOGGLE_DISABLED:
+      return state.map(t => {
+        if (t.name === action.payload) {
+          return { ...t, disabled: !t.disabled }
+        }
+        else {
+          return t;
+        }
+      });
+      
     default:
       return state;
   }
