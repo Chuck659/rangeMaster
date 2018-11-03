@@ -10,7 +10,8 @@ import {
   resetTarget,
   clearTargetData,
   executeFunction,
-  toggleDisabled
+  toggleDisabled,
+  toggleDebug
 } from '../actions';
 
 class ShowTarget extends Component {
@@ -35,8 +36,12 @@ class ShowTarget extends Component {
     this.props.executeFunction(this.props.target.name, func);
   }
 
-  onPress() {
+  onToggleDisabled() {
     this.props.toggleDisabled(this.props.target.name);
+  }
+
+  onToggleDebug() {
+    this.props.toggleDebug(this.props.target.name);
   }
 
   showData(data) {
@@ -50,6 +55,16 @@ class ShowTarget extends Component {
         ))}
       </View>
     );
+  }
+
+  getStatus(target) {
+    if (target.disabled) {
+      return 'disabled';
+    } else if (target.networkError) {
+      return 'network error';
+    } else {
+      return target.status;
+    }
   }
 
   render() {
@@ -67,7 +82,7 @@ class ShowTarget extends Component {
           </CardSection>
 
           <CardSection>
-            <LabelledText label="Status" text={target.status} />
+            <LabelledText label="Status" text={this.getStatus(target)} />
           </CardSection>
 
           <CardSection>
@@ -116,13 +131,18 @@ class ShowTarget extends Component {
           </CardSection>
 
           <CardSection>
-            <Button onPress={() => this.onPress()}>{!target.disabled ? "Disable" : "Enable"}</Button>
+            <Button onPress={() => this.onToggleDisabled()}>
+              {target.disabled ? 'Enable' : 'Disable'}
+            </Button>
+            <Button onPress={() => this.onToggleDebug()}>
+              {target.debug ? 'Debug Off' : 'Debug On'}
+            </Button>
           </CardSection>
 
           <CardSection>
             <Button onPress={() => this.onDelete()}>Delete</Button>
           </CardSection>
-          <CardSection></CardSection>
+          <CardSection />
         </Card>
       </ScrollView>
     );
@@ -143,7 +163,8 @@ const actionsToMap = {
   resetTarget,
   clearTargetData,
   executeFunction,
-  toggleDisabled
+  toggleDisabled,
+  toggleDebug
 };
 export default connect(
   mapStateToProps,

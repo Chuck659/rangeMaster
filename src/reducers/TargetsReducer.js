@@ -12,16 +12,15 @@ import {
   TARGET_DATA_UPDATE_COMPLETE,
   TARGET_DATA_CLEAR,
   TARGET_NETWORK_ERROR,
-  TOGGLE_DISABLED
+  TOGGLE_DISABLED,
+  TOGGLE_DEBUG
 } from '../actions/types';
 import Debug from '../Debug';
 
 const INITIAL_STATE = [];
 
 export default (state = INITIAL_STATE, action) => {
-  if (
-    action.type == TOGGLE_DISABLED
-    ) {
+  if (action.type == TOGGLE_DEBUG) {
     Debug.log(
       `Targets Reducer: ${JSON.stringify(action)}, ${JSON.stringify(state)}`
     );
@@ -37,6 +36,7 @@ export default (state = INITIAL_STATE, action) => {
           networkError: false,
           polling: false,
           disabled: false,
+          debug: false,
           text: []
         }));
       }
@@ -62,15 +62,15 @@ export default (state = INITIAL_STATE, action) => {
     case TARGET_DATA_UPDATE_COMPLETE:
       return state.map(t => {
         if (t.name === action.payload.name) {
-          let noBlankLines = action.payload.text.filter((t) => t.length > 0);
-          let networkError = action.payload.hasOwnProperty("networkError") ? action.payload.networkError : t.networkError;
+          let noBlankLines = action.payload.text.filter(t => t.length > 0);
+          let networkError = action.payload.hasOwnProperty('networkError')
+            ? action.payload.networkError
+            : t.networkError;
           return {
-            ...t, 
+            ...t,
             polling: false,
             status: action.payload.status,
-            text: t.text
-              ? t.text.concat(noBlankLines)
-              : noBlankLines,
+            text: t.text ? t.text.concat(noBlankLines) : noBlankLines,
             networkError
           };
         } else {
@@ -114,13 +114,21 @@ export default (state = INITIAL_STATE, action) => {
     case TOGGLE_DISABLED:
       return state.map(t => {
         if (t.name === action.payload) {
-          return { ...t, disabled: !t.disabled }
-        }
-        else {
+          return { ...t, disabled: !t.disabled };
+        } else {
           return t;
         }
       });
-      
+
+    case TOGGLE_DEBUG:
+      return state.map(t => {
+        if (t.name === action.payload) {
+          return { ...t, debug: !t.debug };
+        } else {
+          return t;
+        }
+      });
+
     default:
       return state;
   }

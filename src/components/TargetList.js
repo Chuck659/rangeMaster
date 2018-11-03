@@ -42,7 +42,9 @@ class TargetList extends Component {
 
   onRun() {
     this.props.targets.forEach(t => {
-      this.props.runTarget(t.name);
+      if (!t.disabled) {
+        this.props.runTarget(t.name);
+      }
     });
   }
 
@@ -92,10 +94,20 @@ class TargetList extends Component {
     }
   }
 
+  getStatus(target) {
+    if (target.disabled) {
+      return 'disabled';
+    } else if (target.networkError) {
+      return 'network error';
+    } else {
+      return target.status;
+    }
+  }
+
   render() {
     // Debug.log(`targets: ${JSON.stringify(this.props.targets)}`);
     const { targets } = this.props;
-    
+
     return (
       <ScrollView>
         {targets.map(t => (
@@ -104,7 +116,7 @@ class TargetList extends Component {
               <Button
                 onPress={() => Actions.showTarget({ targetname: t.name })}
               >
-                {t.name} - {t.networkError ? 'network error' : t.status}
+                {t.name} - {this.getStatus(t)}
               </Button>
             </CardSection>
             {this.showData(t.text)}

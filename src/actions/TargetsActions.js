@@ -10,7 +10,8 @@ import {
   TARGET_RUN,
   TARGET_EXEC_FUNCTION,
   TARGET_NETWORK_ERROR,
-  TOGGLE_DISABLED
+  TOGGLE_DISABLED,
+  TOGGLE_DEBUG
 } from './types';
 
 export const fetchTargets = () => ({
@@ -48,12 +49,12 @@ export const updateStatus = () => ({
 export const updateDataStart = name => ({
   type: TARGET_DATA_UPDATE_START,
   payload: name
-})
+});
 
 export const updateData = name => ({
   type: TARGET_DATA_UPDATE,
   payload: name
-})
+});
 
 export const executeFunction = (name, func) => ({
   type: TARGET_EXEC_FUNCTION,
@@ -67,5 +68,10 @@ export const networkError = target => ({
 
 export const toggleDisabled = name => ({
   type: TOGGLE_DISABLED,
+  payload: name
+});
+
+export const toggleDebug = name => ({
+  type: TOGGLE_DEBUG,
   payload: name
 });

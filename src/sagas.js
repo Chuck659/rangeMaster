@@ -26,7 +26,7 @@ import { networkError } from './actions';
 import Debug from './Debug';
 
 // let testPort = ":8080";
-let testPort = "";
+let testPort = '';
 
 function* fetchTargets(action) {
   try {
@@ -64,6 +64,7 @@ function* removeSaga() {
   yield takeEvery(TARGET_REMOVE, saveTargets);
 }
 
+/* update status is not used (update data returns status now)
 function* updateStatus() {
   const targets = yield select(getTargets);
   try {
@@ -106,6 +107,7 @@ function* updateStatus() {
 function* updateStatusSaga() {
   yield takeLatest(TARGET_STATUS_UPDATE_START, updateStatus);
 }
+*/
 
 function* updateData(action) {
   const targets = yield select(getTargets);
@@ -113,30 +115,38 @@ function* updateData(action) {
   // Debug.log(`Targets: ${JSON.stringify(targets)}`);
   const target = targets.filter(t => t.name == action.payload)[0];
   if (target) {
-    Debug.log(`target: ${JSON.stringify(target)}`);
+    Debug.logIf(target.debug, `target: ${JSON.stringify(target)}`);
     try {
-      Debug.log(`==> http://${target.address}${testPort}/hitData`);
+      Debug.logIf(
+        target.debug,
+        `==> http://${target.address}${testPort}/hitData`
+      );
       const data = yield call(() =>
         fetch(`http://${target.address}${testPort}/hitData`)
           .then(res => {
             return res.json();
           })
-          .then(json => ({...json, networkError: false}))
+          .then(json => ({ ...json, networkError: false }))
           .catch(e => {
-            Debug.log(`error on fetch :  ${JSON.stringify(e)} ${target.name}`);
+            Debug.logIf(
+              target.debug,
+              `error on fetch :  ${JSON.stringify(e)} ${target.name}`
+            );
             return { data: [], status: target.status, networkError: true };
           })
       );
-      Debug.log(`here: ${target.name} ` + JSON.stringify(data));
-      if (data.data.length > 0) {
-        Debug.log('here: ' + JSON.stringify(data));
-      }
+      Debug.logIf(target.debug, `here: ${target.name} ` + JSON.stringify(data));
       yield put({
         type: TARGET_DATA_UPDATE_COMPLETE,
-        payload: { ...target, status: data.status, text: data.data, networkError: data.networkError }
+        payload: {
+          ...target,
+          status: data.status,
+          text: data.data,
+          networkError: data.networkError
+        }
       });
     } catch (e) {
-      Debug.log(`Catch: ${JSON.stringify(e)}`);
+      Debug.logIf(target.debug, `Catch: ${JSON.stringify(e)}`);
       yield put({
         type: TARGET_DATA_UPDATE_COMPLETE,
         payload: { ...target, text: [] }
@@ -225,7 +235,7 @@ export default function* rootSaga() {
     fetchSaga(),
     saveSaga(),
     removeSaga(),
-    updateStatusSaga(),
+    // updateStatusSaga(),
     updateDataSaga(),
     resetSaga(),
     runSaga(),
