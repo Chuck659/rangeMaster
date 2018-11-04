@@ -20,7 +20,7 @@ import Debug from '../Debug';
 const INITIAL_STATE = [];
 
 export default (state = INITIAL_STATE, action) => {
-  if (action.type == TOGGLE_DEBUG) {
+  if (action.type == TOGGLE_DEBUG || action.type == TOGGLE_DISABLED) {
     Debug.log(
       `Targets Reducer: ${JSON.stringify(action)}, ${JSON.stringify(state)}`
     );
