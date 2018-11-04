@@ -114,7 +114,7 @@ export default (state = INITIAL_STATE, action) => {
     case TOGGLE_DISABLED:
       return state.map(t => {
         if (t.name === action.payload) {
-          return { ...t, disabled: !t.disabled };
+          return { ...t, disabled: !t.disabled, polling: false };
         } else {
           return t;
         }
