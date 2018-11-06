@@ -114,7 +114,10 @@ function* updateData(action) {
   // Debug.log(`Action: ${JSON.stringify(action)}`);
   // Debug.log(`Targets: ${JSON.stringify(targets)}`);
   const target = targets.filter(t => t.name == action.payload)[0];
-  if (target) {
+  if (!target) {
+    Debug.log(`Unknown target: ${JSON.stringify(action)}`);
+  }
+  else {
     Debug.logIf(target.debug, `target: ${JSON.stringify(target)}`);
     try {
       Debug.logIf(

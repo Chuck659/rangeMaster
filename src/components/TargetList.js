@@ -32,7 +32,7 @@ class TargetList extends Component {
       if (this.props.targets) {
         this.props.targets.forEach(this.checkTimer.bind(this));
       }
-    }, 1000);
+    }, 2000);
   }
 
   componentWillUnmount() {
@@ -83,7 +83,8 @@ class TargetList extends Component {
 
   checkTimer(target) {
     // Debug.log(`==> ${JSON.stringify(target)}`);
-    if (!target.disabled && !target.polling && !this.timers[target.name]) {
+    // if (!target.disabled && !target.polling && !this.timers[target.name]) {
+    if (!target.disabled && !this.timers[target.name]) {
       // Debug.log(`start timer: ${target.name}`);
       this.timers[target.name] = setTimeout(() => {
         // Debug.log(`timer fired: ${target.name}`);

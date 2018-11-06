@@ -105,7 +105,7 @@ export default (state = INITIAL_STATE, action) => {
       Debug.log(`TARGET_NETWORK_ERROR : ${action.payload}`);
       return state.map(t => {
         if (t.name === action.payload) {
-          return { ...t, networkError: true };
+          return { ...t, networkError: true, polling: false };
         } else {
           return t;
         }
