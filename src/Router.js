@@ -13,7 +13,7 @@ const RouterComponent = props => {
           <Scene
             key="targetList"
             component={TargetList}
-            title="Shooting Range"
+            title="Range Master V2"
             initial
             rightTitle="Add"
             onRight={() => {

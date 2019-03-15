@@ -1,4 +1,4 @@
-package com.rangemaster;
+package com.rangemasterv2;
 
 import android.app.Application;
 
