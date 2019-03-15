@@ -1,8 +1,4 @@
-import {
-  TARGET_FORM_UPDATE,
-  TARGET_FORM_RESET,
-  TARGET_CREATE
-} from '../actions/types';
+import { TARGET_FORM_UPDATE, TARGET_FORM_RESET } from '../actions/types';
 
 const INITIAL_STATE = {
   name: '',

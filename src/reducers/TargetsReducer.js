@@ -13,7 +13,8 @@ import {
   TARGET_DATA_CLEAR,
   TARGET_NETWORK_ERROR,
   TOGGLE_DISABLED,
-  TOGGLE_DEBUG
+  TOGGLE_DEBUG,
+  TARGET_COMMAND_UPDATE
 } from '../actions/types';
 import Debug from '../Debug';
 
@@ -40,6 +41,15 @@ export default (state = INITIAL_STATE, action) => {
           text: []
         }));
       }
+
+    case TARGET_COMMAND_UPDATE:
+      return state.map(t => {
+        if (t.name === action.payload.name) {
+          return { ...t, command: action.payload.command };
+        } else {
+          return t;
+        }
+      });
 
     case TARGET_STATUS_UPDATE_COMPLETE:
       return state.map(t => {

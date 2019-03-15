@@ -13,7 +13,7 @@ class AddTarget extends Component {
   }
   onButtonPress() {
     const { name, address } = this.props;
-    this.props.targetCreate({ name, address, status: 'unknown' });
+    this.props.targetCreate({ name, address, status: 'unknown', command: '' });
   }
   onClear() {
     this.props.targetFormReset();
@@ -61,4 +61,7 @@ const mapStateToProps = state => {
 };
 
 const actionsToMap = { targetFormUpdate, targetFormReset, targetCreate };
-export default connect(mapStateToProps, actionsToMap)(AddTarget);
+export default connect(
+  mapStateToProps,
+  actionsToMap
+)(AddTarget);

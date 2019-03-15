@@ -116,8 +116,7 @@ function* updateData(action) {
   const target = targets.filter(t => t.name == action.payload)[0];
   if (!target) {
     Debug.log(`Unknown target: ${JSON.stringify(action)}`);
-  }
-  else {
+  } else {
     Debug.logIf(target.debug, `target: ${JSON.stringify(target)}`);
     try {
       Debug.logIf(
@@ -216,14 +215,31 @@ function* execTarget(action) {
   const target = targets.filter(t => t.name == action.payload.name)[0];
   if (target) {
     console.log(`http://${target.address}${testPort}/${action.payload.func}`);
-    try {
-      yield call(() => {
-        fetch(
-          `http://${target.address}${testPort}/${action.payload.func}`
-        ).then(res => res.json());
-      });
-    } catch (e) {
-      console.log(e.message);
+    if (action.payload.data) {
+      Debug.log(JSON.stringify(action.payload.data));
+      try {
+        yield call(() => {
+          fetch(`http://${target.address}${testPort}/${action.payload.func}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'text/plain'
+            },
+            body: action.payload.data
+          }).then(res => res.json());
+        });
+      } catch (e) {
+        console.log(e.message);
+      }
+    } else {
+      try {
+        yield call(() => {
+          fetch(
+            `http://${target.address}${testPort}/${action.payload.func}`
+          ).then(res => res.json());
+        });
+      } catch (e) {
+        console.log(e.message);
+      }
     }
   }
 }

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Text, View, ScrollView, CheckBox } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import { Card, CardSection, LabelledText, Button } from './common';
+import { Card, CardSection, LabelledText, Button, Input } from './common';
 // import Debug from '../Debug';
 import {
   deleteTarget,
@@ -11,7 +11,8 @@ import {
   clearTargetData,
   executeFunction,
   toggleDisabled,
-  toggleDebug
+  toggleDebug,
+  updateCommand
 } from '../actions';
 
 class ShowTarget extends Component {
@@ -32,8 +33,8 @@ class ShowTarget extends Component {
     this.props.clearTargetData(this.props.target.name);
   }
 
-  onFunction(func) {
-    this.props.executeFunction(this.props.target.name, func);
+  onFunction(func, data) {
+    this.props.executeFunction(this.props.target.name, func, data);
   }
 
   onToggleDisabled() {
@@ -67,6 +68,10 @@ class ShowTarget extends Component {
     }
   }
 
+  onCommandChange(command) {
+    this.props.updateCommand(this.props.target.name, command);
+  }
+
   render() {
     const { target } = this.props;
     if (!target) return <View />;
@@ -83,6 +88,10 @@ class ShowTarget extends Component {
 
           <CardSection>
             <LabelledText label="Status" text={this.getStatus(target)} />
+          </CardSection>
+
+          <CardSection>
+            <Button onPress={() => this.onRun()}>Run</Button>
           </CardSection>
 
           <CardSection>
@@ -113,10 +122,20 @@ class ShowTarget extends Component {
           </CardSection>
 
           <CardSection>
-            <Button onPress={() => this.onFunction('function7')}>
-              Function 7
+            <Button
+              onPress={() => this.onFunction('function7', target.command)}
+            >
+              Send Command
             </Button>
-            <Button onPress={() => this.onRun()}>Run</Button>
+          </CardSection>
+
+          <CardSection>
+            <Input
+              label=""
+              value={target.command}
+              placeholder="command data"
+              onChangeText={this.onCommandChange.bind(this)}
+            />
           </CardSection>
 
           <View>
@@ -164,7 +183,8 @@ const actionsToMap = {
   clearTargetData,
   executeFunction,
   toggleDisabled,
-  toggleDebug
+  toggleDebug,
+  updateCommand
 };
 export default connect(
   mapStateToProps,

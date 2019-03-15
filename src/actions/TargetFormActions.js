@@ -10,12 +10,12 @@ export const targetFormUpdate = ({ prop, value }) => {
 
 export const targetFormReset = () => ({ type: TARGET_FORM_RESET });
 
-export const targetCreate = ({ name, address, status }) => {
+export const targetCreate = ({ name, address, status, command }) => {
   // console.log(`targetCreate: ${name}, ${address}, ${status}`);
   if (name && address) {
     return {
       type: TARGET_CREATE,
-      payload: { name, address, status }
+      payload: { name, address, status, command }
     };
   } else {
     return {
