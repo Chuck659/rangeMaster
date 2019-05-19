@@ -28,11 +28,11 @@ class TargetList extends Component {
       `TargetList::componentDidMount: ${JSON.stringify(this.props.targets)}`
     );
     this.props.fetchTargets();
-    this.timer = setInterval(() => {
-      if (this.props.targets) {
-        this.props.targets.forEach(this.checkTimer.bind(this));
-      }
-    }, 2000);
+    // this.timer = setInterval(() => {
+    //   if (this.props.targets) {
+    //     this.props.targets.forEach(this.checkTimer.bind(this));
+    //   }
+    // }, 2000);
   }
 
   componentWillUnmount() {
@@ -42,10 +42,20 @@ class TargetList extends Component {
 
   onRun() {
     this.props.targets.forEach(t => {
-      if (!t.disabled) {
+      if (!t.disabled && !this.timers[t.name]) {
         this.props.runTarget(t.name);
+        this.startDataTimer(t.name);
       }
     });
+  }
+
+  startDataTimer(name) {
+    this.timers[name] = setTimeout(() => {
+      Debug.log('ListTarget::Timeout get data: ' + name);
+      this.props.updateDataStart(name);
+      this.props.updateData(name);
+      this.timers[name] = null;
+    }, 10000);
   }
 
   onReset() {
@@ -57,6 +67,15 @@ class TargetList extends Component {
   onClearData() {
     this.props.targets.forEach(t => {
       this.props.clearTargetData(t.name);
+    });
+  }
+
+  onRefresh() {
+    this.props.targets.forEach(t => {
+      if (!t.disabled) {
+        this.props.updateDataStart(t.name);
+        this.props.updateData(t.name);
+      }
     });
   }
 
@@ -82,6 +101,7 @@ class TargetList extends Component {
   }
 
   checkTimer(target) {
+    // This code is currently disabled (timer is not started)
     // Debug.log(`==> ${JSON.stringify(target)}`);
     // if (!target.disabled && !target.polling && !this.timers[target.name]) {
     if (!target.disabled && !this.timers[target.name]) {
@@ -131,6 +151,13 @@ class TargetList extends Component {
         {targets.length === 0 ? null : (
           <CardSection>
             <Button onPress={() => this.onClearData()}>Clear All Data</Button>
+          </CardSection>
+        )}
+        {targets.length === 0 ? null : (
+          <CardSection>
+            <Button onPress={() => this.onRefresh()}>
+              Refresh All Targets
+            </Button>
           </CardSection>
         )}
         {targets.length !== 0 ? null : (

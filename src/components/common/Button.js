@@ -1,13 +1,20 @@
 import React from 'react';
 import { Text, TouchableOpacity } from 'react-native';
 
-const Button = ({ children, onPress, onLongPress, delayLongPress = 1000 }) => {
+const Button = ({
+  children,
+  onPress,
+  onLongPress,
+  delayLongPress = 1000,
+  disabled
+}) => {
   return (
     <TouchableOpacity
       delayLongPress={delayLongPress}
       onPress={onPress}
       onLongPress={onLongPress}
-      style={styles.buttonStyle}
+      style={!disabled ? styles.buttonStyle : styles.disabledStyle}
+      disabled={disabled}
     >
       <Text style={styles.textStyle}>{children}</Text>
     </TouchableOpacity>
@@ -32,6 +39,16 @@ const styles = {
     fontWeight: '600',
     paddingTop: 10,
     paddingBottom: 10
+  },
+  disabledStyle: {
+    flex: 1,
+    alignSelf: 'stretch',
+    backgroundColor: '#161616',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#007aff',
+    marginLeft: 5,
+    marginRight: 5
   }
 };
 
