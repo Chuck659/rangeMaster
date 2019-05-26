@@ -86,7 +86,7 @@ function* updateStatus() {
               })
               .catch(e => {
                 Debug.log('catch: ' + e.message);
-                networkError(t);
+                networkError(t.name);
                 return { type: 'dummy', payload: '' };
               })
           );
@@ -95,7 +95,7 @@ function* updateStatus() {
           yield put(data);
         } catch (e) {
           Debug.log('catch: ' + e.message);
-          yield put(networkError(t));
+          yield put(networkError(t.name));
         }
       }
     }
@@ -116,8 +116,7 @@ function* updateData(action) {
   const target = targets.filter(t => t.name == action.payload)[0];
   if (!target) {
     Debug.log(`Unknown target: ${JSON.stringify(action)}`);
-  }
-  else {
+  } else {
     Debug.logIf(target.debug, `target: ${JSON.stringify(target)}`);
     try {
       Debug.logIf(

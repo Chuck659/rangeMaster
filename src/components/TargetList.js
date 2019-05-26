@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
-import { ScrollView, View, Text, AccessibilityInfo } from 'react-native';
+import { ScrollView, View, Text } from 'react-native';
 import { connect } from 'react-redux';
-import { Card, CardSection, Button, Input } from './common';
+import { CardSection, Button } from './common';
 import { Actions } from 'react-native-router-flux';
 import Debug from '../Debug';
 
 import {
   fetchTargets,
   updateStatus,
+  updateStatusWS,
   updateDataStart,
   updateData,
+  updateDataWS,
   runTarget,
   resetTarget,
-  clearTargetData
+  clearTargetData,
+  networkError
 } from '../actions';
+import websocket from '../websocket';
 
 class TargetList extends Component {
   constructor(props) {
@@ -21,18 +25,27 @@ class TargetList extends Component {
     this.showTargetText = '';
     this.timers = {};
     this.timer = null;
+    this.fetched = false;
   }
 
   componentDidMount() {
+    websocket.init(
+      (name, status) => this.props.updateStatusWS(name, status, false),
+      (name, data) => this.props.updateDataWS(name, [data]),
+      name => this.props.networkError(name)
+    );
     Debug.log(
       `TargetList::componentDidMount: ${JSON.stringify(this.props.targets)}`
     );
-    this.props.fetchTargets();
-    this.timer = setInterval(() => {
-      if (this.props.targets) {
-        this.props.targets.forEach(this.checkTimer.bind(this));
-      }
-    }, 2000);
+    if (!this.fetched) {
+      this.props.fetchTargets();
+      this.fetched = true;
+    }
+    // this.timer = setInterval(() => {
+    //   if (this.props.targets) {
+    //     this.props.targets.forEach(this.checkTimer.bind(this));
+    //   }
+    // }, 2000);
   }
 
   componentWillUnmount() {
@@ -158,11 +171,14 @@ const mapStateToProps = state => {
 const actionsToMap = {
   fetchTargets,
   updateStatus,
+  updateStatusWS,
   updateData,
   updateDataStart,
+  updateDataWS,
   runTarget,
   resetTarget,
-  clearTargetData
+  clearTargetData,
+  networkError
 };
 export default connect(
   mapStateToProps,

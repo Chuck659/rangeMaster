@@ -16,6 +16,7 @@ import {
   TOGGLE_DEBUG
 } from '../actions/types';
 import Debug from '../Debug';
+import websocket from '../websocket';
 
 const INITIAL_STATE = [];
 
@@ -30,7 +31,7 @@ export default (state = INITIAL_STATE, action) => {
       if (!action.payload) {
         return [];
       } else {
-        return action.payload.map(target => ({
+        targets = action.payload.map(target => ({
           ...target,
           status: 'unknown',
           networkError: false,
@@ -39,6 +40,10 @@ export default (state = INITIAL_STATE, action) => {
           debug: false,
           text: []
         }));
+        targets.forEach(t => {
+          websocket.addTarget(t.name, t.address);
+        });
+        return targets;
       }
 
     case TARGET_STATUS_UPDATE_COMPLETE:
@@ -66,10 +71,13 @@ export default (state = INITIAL_STATE, action) => {
           let networkError = action.payload.hasOwnProperty('networkError')
             ? action.payload.networkError
             : t.networkError;
+          let status = action.payload.hasOwnProperty('status')
+            ? action.payload.status
+            : t.status;
           return {
             ...t,
             polling: false,
-            status: action.payload.status,
+            status,
             text: t.text ? t.text.concat(noBlankLines) : noBlankLines,
             networkError
           };
@@ -96,9 +104,11 @@ export default (state = INITIAL_STATE, action) => {
         }
       });
     case TARGET_CREATE:
+      websocket.addTarget(action.payload.name, action.payload.address);
       return state.concat([action.payload]);
 
     case TARGET_REMOVE:
+      websocket.deleteTarget(action.payload);
       return state.filter(t => t.name != action.payload);
 
     case TARGET_NETWORK_ERROR:
